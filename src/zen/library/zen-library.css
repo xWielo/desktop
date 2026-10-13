@@ -908,7 +908,8 @@ zen-library-history-section {
 }
 
 .zen-library-boost-row {
-  padding: 12px 12px 12px 4px;
+  padding: 12px;
+  padding-inline-start: 4px;
   border-radius: 18px;
 }
 
@@ -1156,6 +1157,27 @@ zen-library-history-section {
     & .tab-group-label-container {
       width: 100% !important;
     }
+
+    /* A card is as wide as an expanded sidebar, so its folders keep their
+       name, indent and icon spot even when the sidebar itself is collapsed. */
+    & zen-folder .tab-group-label {
+      visibility: visible !important;
+      padding: 0 0 0 32px !important;
+      max-width: -moz-available !important;
+    }
+
+    & zen-folder > .tab-group-label-container {
+      padding-inline-end: calc(var(--tab-group-label-padding) * 2);
+    }
+
+    & .tab-group-folder-icon {
+      left: 5px;
+    }
+
+    & zen-folder > .tab-group-container > * {
+      --zen-folder-indent: 14px;
+      margin-inline-start: var(--zen-folder-indent) !important;
+    }
   }
 
   & .zen-current-workspace-indicator {
@@ -1233,6 +1255,11 @@ zen-library-history-section {
   .zen-library-space-header:hover & {
     translate: 28px 0;
     margin-inline-end: 28px;
+
+    /* translate is physical, so it has to go the other way round in rtl */
+    &:dir(rtl) {
+      translate: -28px 0;
+    }
   }
 }
 
