@@ -323,10 +323,11 @@
     }
 
     & .zen-library-download-badge {
-      margin: auto 20px auto 8px;
+      margin: auto;
+      margin-inline: 8px 20px;
 
       &[downloading] {
-        margin-right: 15px;
+        margin-inline-end: 15px;
       }
 
       :root:not([zen-sidebar-expanded="true"]) & {

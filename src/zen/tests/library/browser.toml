@@ -13,6 +13,8 @@ prefs = [
 
 ["browser_library_folder_first_expand.js"]
 
+["browser_library_navbar_overlap.js"]
+
 ["browser_library_rapid_toggle.js"]
 
 ["browser_library_toggle_sidebar_width.js"]

@@ -44,6 +44,10 @@ ChromeUtils.defineLazyGetter(lazy, "toastContainer", function () {
   return document.getElementById("zen-toast-container");
 });
 
+ChromeUtils.defineLazyGetter(lazy, "navBar", function () {
+  return document.getElementById("nav-bar");
+});
+
 export class ZenLibrary extends MozLitElement {
   static instance = null;
   static getInstance() {
@@ -57,6 +61,8 @@ export class ZenLibrary extends MozLitElement {
   #springControls = null;
 
   #toolboxWidth = 0;
+  // How far the nav bar sticks out of the content on the side of the library.
+  #navBarOverhang = 0;
 
   #originalButtonsNextSibling = null;
 
@@ -193,6 +199,14 @@ export class ZenLibrary extends MozLitElement {
         "transform",
         `translateX(${-(value * webOffset)}px)`
       );
+      // The nav bar of a collapsed sidebar reaches over where the sidebar was,
+      // which would put its first buttons on top of the library.
+      if (this.#navBarOverhang) {
+        lazy.navBar.style.setProperty(
+          "translate",
+          `${leftAligned * value * this.#navBarOverhang}px 0`
+        );
+      }
 
       const toolboxProgress = Math.min(1, value * 3);
       if (this.#isCompactMode) {
@@ -322,6 +336,7 @@ export class ZenLibrary extends MozLitElement {
   #clearStyleProperties() {
     lazy.appContentWrapper.style.removeProperty("transform");
     lazy.toastContainer.style.removeProperty("transform");
+    lazy.navBar.style.removeProperty("translate");
     gNavToolbox.style.removeProperty("transform");
     gNavToolbox.style.removeProperty("opacity");
   }
@@ -755,6 +770,22 @@ export class ZenLibrary extends MozLitElement {
   #refreshToolboxWidth() {
     this.#toolboxWidth =
       window.windowUtils.getBoundsWithoutFlushing(gNavToolbox).width;
+
+    // Measured before anything has been moved. A nav bar that is not in the
+    // content, as with the compact sidebar, has nothing to give back.
+    this.#navBarOverhang = 0;
+    if (lazy.appContentWrapper.contains(lazy.navBar)) {
+      const content = window.windowUtils.getBoundsWithoutFlushing(
+        lazy.appContentWrapper
+      );
+      const navBar = window.windowUtils.getBoundsWithoutFlushing(lazy.navBar);
+      this.#navBarOverhang = Math.max(
+        0,
+        this.#libraryOnRight
+          ? navBar.right - content.right
+          : content.left - navBar.left
+      );
+    }
   }
 
   createRenderRoot() {
