@@ -1347,37 +1347,47 @@ class nsZenFolders extends nsZenDOMOperatedFeature {
       if (node && stateData.parentId) {
         const parentWorkingData = tabFolderWorkingData.get(stateData.parentId);
         if (parentWorkingData && parentWorkingData.node) {
-          switch (stateData?.prevSiblingInfo?.type) {
-            case "tab":
-            case "group": {
-              const item = document.getElementById(
-                stateData.prevSiblingInfo.id
-              );
-              if (item) {
-                item.after(node);
-                break;
-              }
-              // If we didn't find the group, we should debug it and continue to default case.
-              console.error(
-                `Zen Folders: Could not find previous sibling with id ${stateData.prevSiblingInfo.id} while restoring session.`
-              );
-              // @eslint-disable-next-line no-fallthrough
-            }
-            default: {
-              // Should insert after zen-empty-tab
-              let start =
-                parentWorkingData.node.groupStartElement.nextElementSibling;
-              start ||=
-                parentWorkingData.node.tabs[0] ||
-                parentWorkingData.node.groupStartElement;
-              if (!start) {
-                console.error(
-                  `Zen Folders: Could not find start element for parent folder with id ${stateData.parentId} while restoring session.`
+          try {
+            switch (stateData?.prevSiblingInfo?.type) {
+              case "tab":
+              case "group": {
+                const item = document.getElementById(
+                  stateData.prevSiblingInfo.id
                 );
-                break;
+                // The sibling can already be inside this folder (its tabs were moved in above),
+                // and inserting next to it would throw a HierarchyRequestError.
+                if (item && !node.contains(item)) {
+                  item.after(node);
+                  break;
+                }
+                // If we didn't find the group, we should debug it and continue to default case.
+                console.error(
+                  `Zen Folders: Could not find previous sibling with id ${stateData.prevSiblingInfo.id} while restoring session.`
+                );
+                // @eslint-disable-next-line no-fallthrough
               }
-              start.after(node);
+              default: {
+                // Should insert after zen-empty-tab
+                let start =
+                  parentWorkingData.node.groupStartElement.nextElementSibling;
+                start ||=
+                  parentWorkingData.node.tabs[0] ||
+                  parentWorkingData.node.groupStartElement;
+                if (!start) {
+                  console.error(
+                    `Zen Folders: Could not find start element for parent folder with id ${stateData.parentId} while restoring session.`
+                  );
+                  break;
+                }
+                start.after(node);
+              }
             }
+          } catch (e) {
+            // Don't let one misplaced folder abort the rest of the session restore.
+            console.error(
+              "Error nesting Zen Folders while restoring session:",
+              e
+            );
           }
         }
       }
