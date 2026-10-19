@@ -1403,7 +1403,10 @@ class nsZenWorkspaces {
     }
   }
 
-  saveWorkspace(workspaceData, { insertAfterId = null } = {}) {
+  saveWorkspace(
+    workspaceData,
+    { insertAfterId = null, insertBeforeId = null } = {}
+  ) {
     if (this.privateWindowOrDisabled) {
       return;
     }
@@ -1414,10 +1417,15 @@ class nsZenWorkspaces {
     const insertAfterIndex = insertAfterId
       ? workspacesData.findIndex(ws => ws.uuid === insertAfterId)
       : -1;
+    const insertBeforeIndex = insertBeforeId
+      ? workspacesData.findIndex(ws => ws.uuid === insertBeforeId)
+      : -1;
     if (index !== -1) {
       workspacesData[index] = workspaceData;
     } else if (insertAfterIndex !== -1) {
       workspacesData.splice(insertAfterIndex + 1, 0, workspaceData);
+    } else if (insertBeforeIndex !== -1) {
+      workspacesData.splice(insertBeforeIndex, 0, workspaceData);
     } else {
       workspacesData.push(workspaceData);
     }
@@ -1593,12 +1601,20 @@ class nsZenWorkspaces {
     }
   }
 
-  async openWorkspaceCreation() {
+  /**
+   * Opens the space creation form in a new space next to the active one.
+   *
+   * @param {object} [options]
+   * @param {boolean} [options.insertBefore] - Place the new space before the
+   *   active one instead of after it, e.g. when it was swiped in from the left.
+   */
+  async openWorkspaceCreation({ insertBefore = false } = {}) {
     let createForm;
     const previousWorkspace = this.getActiveWorkspace();
     document.documentElement.setAttribute("zen-creating-workspace", "true");
     await this.createAndSaveWorkspace("Space", undefined, false, 0, {
-      insertAfterId: previousWorkspace?.uuid,
+      insertAfterId: insertBefore ? null : previousWorkspace?.uuid,
+      insertBeforeId: insertBefore ? previousWorkspace?.uuid : null,
       beforeChangeCallback: async workspace => {
         createForm = document.createXULElement("zen-workspace-creation");
         createForm.setAttribute("workspace-id", workspace.uuid);
@@ -2796,9 +2812,14 @@ class nsZenWorkspaces {
     icon = undefined,
     dontChange = false,
     containerTabId = 0,
-    // beforeChangeCallback runs before changing workspace, insertAfterId places
-    // the new space right after an existing one instead of at the end.
-    { beforeChangeCallback = null, insertAfterId = null } = {}
+    // beforeChangeCallback runs before changing workspace, insertAfterId and
+    // insertBeforeId place the new space right after or before an existing
+    // one instead of at the end.
+    {
+      beforeChangeCallback = null,
+      insertAfterId = null,
+      insertBeforeId = null,
+    } = {}
   ) {
     if (!this.workspaceEnabled) {
       return null;
@@ -2819,7 +2840,7 @@ class nsZenWorkspaces {
       this.#createWorkspaceTabsSection(workspaceData, extraTabs);
       this._organizeWorkspaceStripLocations(workspaceData);
     }
-    this.saveWorkspace(workspaceData, { insertAfterId });
+    this.saveWorkspace(workspaceData, { insertAfterId, insertBeforeId });
     if (!dontChange) {
       if (beforeChangeCallback) {
         try {
