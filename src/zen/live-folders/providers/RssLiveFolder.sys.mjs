@@ -289,8 +289,17 @@ export class nsRssLiveFolderProvider extends nsZenLiveFolderProvider {
           this.state.url
         );
         if (url) {
+          const isNewFeed = url !== this.state.url;
           this.state.url = url;
           this.refresh();
+          if (isNewFeed) {
+            // The folder is named after its feed, so follow the new one.
+            const { label } = await this.getMetadata();
+            const folder = this.manager.getFolderForLiveFolder(this);
+            if (folder && label) {
+              folder.label = label;
+            }
+          }
         }
         break;
       }
