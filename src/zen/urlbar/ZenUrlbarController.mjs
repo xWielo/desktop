@@ -3,6 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { UrlbarShared } from "chrome://browser/content/urlbar/UrlbarShared.mjs";
+import { UrlbarProviderTopSites } from "moz-src:///browser/components/urlbar/UrlbarProviderTopSites.sys.mjs";
 
 const SEARCH_MODE_ANIMATION_RESET_MS = 1000;
 
@@ -21,6 +22,22 @@ export class nsZenUrlbarController {
   // Search mode animation.
   #animatingSearchMode = false;
   #animatingSearchModeTimeout = null;
+
+  // Top Sites listeners are only held weakly, so keep this one referenced here.
+  // Zen opens the URL bar on startup, which can query Top Sites before they
+  // are loaded. Firefox only clears its cache when they change, so re-run the
+  // empty query while the view is open.
+  #topSitesListener = () => {
+    if (
+      window.closed ||
+      !gURLBar.view.isOpen ||
+      gURLBar.value ||
+      gURLBar.searchMode
+    ) {
+      return;
+    }
+    gURLBar.startQuery({ resetSearchState: false });
+  };
 
   constructor() {
     XPCOMUtils.defineLazyPreferenceGetter(
@@ -48,6 +65,7 @@ export class nsZenUrlbarController {
     window.gZenSiteDataPanel = new ZenSiteDataPanel(window);
     gURLBar._zenTrimURL = this.trimURL.bind(this);
     gURLBar._setPlaceholder(null);
+    UrlbarProviderTopSites.addTopSitesListener(this.#topSitesListener);
 
     window.addEventListener("Zen:UrlbarSearchModeChanged", event =>
       this.#onSearchModeChanged(event)
