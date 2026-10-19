@@ -1,0 +1,34 @@
+diff --git a/browser/components/preferences/findInPage.js b/browser/components/preferences/findInPage.js
+index 8029087a756788fa2d0dab60f236f916981c9672..b49e44aaffc171c6a7ff495b691b22b9be3978b8 100644
+--- a/browser/components/preferences/findInPage.js
++++ b/browser/components/preferences/findInPage.js
+@@ -490,7 +490,19 @@ var gSearchResultsPane = {
+       // Hide any subitems that don't match the search term and show
+       // only those that do.
+       if (this.subItems.size) {
++        // If no keyboard shortcuts group matched, the query only matched the
++        // shortcuts header (e.g. "shortcuts"), so keep all the groups visible.
++        let showAllZenCKSSections = ![...this.subItems].some(
++          ([subItem, matches]) =>
++            matches && subItem.classList.contains("zenCKSOption-section")
++        );
+         for (let [subItem, matches] of this.subItems) {
++          if (
++            showAllZenCKSSections &&
++            subItem.classList.contains("zenCKSOption-section")
++          ) {
++            matches = true;
++          }
+           subItem.classList.toggle("visually-hidden", !matches);
+         }
+       }
+@@ -784,7 +796,8 @@ var gSearchResultsPane = {
+       if (
+         Element.isInstance(child) &&
+         (child.classList.contains("featureGate") ||
+-          child.classList.contains("mozilla-product-item"))
++          child.classList.contains("mozilla-product-item") ||
++          child.classList.contains("zenCKSOption-section"))
+       ) {
+         this.subItems.set(child, result);
+       }
