@@ -129,7 +129,12 @@ export class ZenSpaceAddSwipe {
 
   endSwipe() {
     this.#progress = 0;
-    gZenWorkspaces.openWorkspaceCreation();
+    // With the library on the right, the new space is swiped in from the left
+    // of the first space, so it has to sit before it for swiping out of the
+    // creation form to land on the spaces around it.
+    gZenWorkspaces.openWorkspaceCreation({
+      insertBefore: this.#libraryOnRight,
+    });
   }
 
   /**
