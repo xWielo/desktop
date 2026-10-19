@@ -168,6 +168,10 @@ export class nsZenLiveFolderProvider {
     const byteChunks = [];
     let totalLength = 0;
 
+    // Always check with the server. Otherwise a cached copy of the feed is
+    // reused until it expires, and refreshing shows the same stale items.
+    channel.loadFlags |= Ci.nsIRequest.VALIDATE_ALWAYS;
+
     channel.asyncOpen({
       onDataAvailable: (request, stream, _offset, count) => {
         totalLength += count;
