@@ -169,6 +169,15 @@ export class nsZenSiteDataPanel {
       }
       this.document.getElementById("cmd_zenCopyCurrentURL").doCommand();
     });
+    // This button sits outside #identity-box, so the identity box dragstart
+    // handler never sees it. Reuse the same link drag data here.
+    aElement.addEventListener("dragstart", event => {
+      if (aElement.hasAttribute("disabled")) {
+        event.preventDefault();
+        return;
+      }
+      this.window.gIdentityHandler.onDragStart(event);
+    });
 
     this.window.gBrowser.addProgressListener({
       onLocationChange: (aWebProgress, aRequest, aLocation) => {
