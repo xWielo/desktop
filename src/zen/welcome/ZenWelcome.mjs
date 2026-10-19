@@ -861,8 +861,11 @@
   // The window can still be resized by things that ignore its size
   // constraints (e.g. tiling window managers). Re-lock to the new size,
   // otherwise the welcome screen stays stuck in a corner of the window.
+  // Only in the normal state: the root constraints get the normal-state frame
+  // added, which does not match the client area when maximized or fullscreen,
+  // so re-locking there would make the window resize itself in a loop.
   function followWindowSize() {
-    if (window.windowState === window.STATE_MINIMIZED) {
+    if (window.windowState !== window.STATE_NORMAL) {
       return;
     }
     lockWindowSize(window.innerWidth, window.innerHeight);
