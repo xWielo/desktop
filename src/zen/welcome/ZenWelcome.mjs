@@ -851,10 +851,21 @@
   }
 
   function unlockWindowSize() {
+    window.removeEventListener("resize", followWindowSize);
     const style = document.documentElement.style;
     for (const property of kSizeLockProperties) {
       style.removeProperty(property);
     }
+  }
+
+  // The window can still be resized by things that ignore its size
+  // constraints (e.g. tiling window managers). Re-lock to the new size,
+  // otherwise the welcome screen stays stuck in a corner of the window.
+  function followWindowSize() {
+    if (window.windowState === window.STATE_MINIMIZED) {
+      return;
+    }
+    lockWindowSize(window.innerWidth, window.innerHeight);
   }
 
   function centerWindowOnScreen() {
@@ -874,6 +885,7 @@
           screen.availTop + (screen.availHeight - height) / 2
         );
         lockWindowSize(width, height);
+        window.addEventListener("resize", followWindowSize);
       },
       { once: true }
     );
