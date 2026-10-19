@@ -13,6 +13,14 @@ class nsZenWorkspaceIcons extends MozXULElement {
     this.#hasConnected = true;
     window.addEventListener("ZenWorkspacesUIUpdate", this, true);
 
+    // Window resize events can be handled before layout catches up (e.g. when
+    // leaving DOM fullscreen, where the sidebar is collapsed), which would
+    // leave the icons stuck in their overflowing state. Recalculate whenever
+    // our own size actually changes.
+    new ResizeObserver(() => {
+      gZenWorkspaces.updateWorkspaceIconsOverflow();
+    }).observe(this);
+
     this.initDragAndDrop();
     this.addEventListener("mouseover", e => {
       if (e.shiftKey || this.isReorderMode) {
