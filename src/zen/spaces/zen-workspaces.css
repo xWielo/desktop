@@ -370,6 +370,14 @@ zen-workspace {
       scrollbar-width: none;
     }
 
+    /* Classic (non-overlay) scrollbars take layout space, which in the narrow
+     * collapsed sidebar pushes the centered tabs to the left and clips them. */
+    @media not (-moz-overlay-scrollbars) {
+      :root:not([zen-sidebar-expanded='true']) &::part(scrollbox) {
+        scrollbar-width: none;
+      }
+    }
+
     &[overflowing] {
       --zen-scrollbar-overflow-background: light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.08));
       &::before {
