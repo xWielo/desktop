@@ -342,8 +342,8 @@ class nsZenPinnedTabManager extends nsZenDOMOperatedFeature {
         return;
       }
 
-      event.stopPropagation();
-      event.preventDefault();
+      event?.stopPropagation();
+      event?.preventDefault();
 
       if (noClose && behavior === "close") {
         behavior = "unload-switch";
