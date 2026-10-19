@@ -124,7 +124,7 @@ index 241875edde94e674713d6651704e19a142c40b5d..8068eac73a64103eb399425b787fce6f
      this.tabpanels.appendChild(panel);
  
      let tab = this.tabs[0];
-+    this.documentGlobal.gZenWorkspaces.handleInitialTab(tab, (!remoteType || remoteType === lazy.E10SUtils.PRIVILEGEDABOUT_REMOTE_TYPE) && !this.documentGlobal.gZenUIManager.testingEnabled);
++    this.documentGlobal.gZenWorkspaces.handleInitialTab(tab, (!remoteType || remoteType === lazy.E10SUtils.PRIVILEGEDABOUT_REMOTE_TYPE) && !this.documentGlobal.gZenUIManager.testingEnabled && !tabArgument?.linkedBrowser);
 +    tab._zenContentsVisible = true;
      tab.linkedPanel = uniqueId;
      this.#selectedTab = tab;
