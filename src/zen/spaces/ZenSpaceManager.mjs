@@ -2720,11 +2720,13 @@ class nsZenWorkspaces {
 
     let menuPopupID = "moveTabOptionsMenu";
     let menuPopup = document.getElementById(menuPopupID);
+    // The menubar's spaces menu is only built once the keyboard shortcuts are
+    // ready, which can be after the space has been set up (or never, if they
+    // were ready first). Don't let its absence leave the "Move Tab" menu empty.
     let menubar = document.getElementById("zen-spaces-menubar");
-    if (!menuPopup || !menubar) {
-      return;
-    }
-    let itemsToFill = [menubar.querySelector("menupopup"), menuPopup];
+    let itemsToFill = [menubar?.querySelector("menupopup"), menuPopup].filter(
+      Boolean
+    );
     for (const popup of itemsToFill) {
       let isMoveTabPopup = popup.id === menuPopupID;
       for (const item of popup.querySelectorAll(
