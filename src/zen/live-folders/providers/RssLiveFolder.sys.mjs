@@ -296,7 +296,8 @@ export class nsRssLiveFolderProvider extends nsZenLiveFolderProvider {
             // The folder is named after its feed, so follow the new one.
             const { label } = await this.getMetadata();
             const folder = this.manager.getFolderForLiveFolder(this);
-            if (folder && label) {
+            // Skip if the feed was changed again while we were fetching.
+            if (folder && label && this.state.url === url) {
               folder.label = label;
             }
           }
