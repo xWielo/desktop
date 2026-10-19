@@ -313,7 +313,8 @@ index 241875edde94e674713d6651704e19a142c40b5d..8068eac73a64103eb399425b787fce6f
      }
 @@ -3513,7 +3625,6 @@ export class Tabbrowser {
              {
-               tabIndex: tab.index + 1,
+-              tabIndex: tab.index + 1,
++              tabIndex: (tab.group?.hasAttribute("split-view-group") ? tab.group.tabs.at(-1) : tab).index + 1,
                userContextId: tab.userContextId,
 -              tabGroup: tab.group,
                focusUrlBar: true,
