@@ -861,6 +861,12 @@ window.gZenCompactModeManager = {
 
     document.documentElement.addEventListener("mouseleave", event => {
       setTimeout(() => {
+        // A window-modal dialog (e.g. Space Routing settings) covers the whole
+        // window, so the sidebar must not be revealed from the screen edge
+        // while it is open, otherwise it flickers open and closed
+        if (gDialogBox.isOpen) {
+          return;
+        }
         const screenEdgeCrossed = this._getCrossedEdge(
           event.pageX,
           event.pageY
