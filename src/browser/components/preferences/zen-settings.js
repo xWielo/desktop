@@ -654,6 +654,8 @@ var gZenMarketplaceManager = {
 
 const kZenExtendedSidebar = "zen.view.sidebar-expanded";
 const kZenSingleToolbar = "zen.view.use-single-toolbar";
+const kZenSingleToolbarBeforeCollapse =
+  "zen.view.use-single-toolbar.before-collapse";
 
 var gZenLooksAndFeel = {
   init() {
@@ -709,6 +711,20 @@ var gZenLooksAndFeel = {
         }
 
         layout.classList.add("selected");
+
+        if (layout.getAttribute("layout") != "collapsed") {
+          // Remember the expanded layout, so expanding the sidebar restores it.
+          Services.prefs.setBoolPref(
+            kZenSingleToolbarBeforeCollapse,
+            layout.getAttribute("layout") == "single"
+          );
+        } else if (Services.prefs.getBoolPref(kZenExtendedSidebar)) {
+          // Collapsing an expanded sidebar keeps its layout, as the toggle does.
+          Services.prefs.setBoolPref(
+            kZenSingleToolbarBeforeCollapse,
+            Services.prefs.getBoolPref(kZenSingleToolbar)
+          );
+        }
 
         Services.prefs.setBoolPref(
           kZenExtendedSidebar,

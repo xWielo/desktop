@@ -58,7 +58,23 @@ window.gZenVerticalTabsManager = {
   toggleExpand() {
     const newVal = !Services.prefs.getBoolPref("zen.view.sidebar-expanded");
     Services.prefs.setBoolPref("zen.view.sidebar-expanded", newVal);
-    Services.prefs.setBoolPref("zen.view.use-single-toolbar", false);
+    // The compact mode sidebar styles read zen.view.use-single-toolbar directly,
+    // so it is cleared while the sidebar is collapsed. Keep the choice so that
+    // expanding the sidebar again restores it.
+    if (!newVal) {
+      Services.prefs.setBoolPref(
+        "zen.view.use-single-toolbar.before-collapse",
+        Services.prefs.getBoolPref("zen.view.use-single-toolbar")
+      );
+      Services.prefs.setBoolPref("zen.view.use-single-toolbar", false);
+    } else if (!Services.prefs.getBoolPref("zen.view.use-single-toolbar")) {
+      Services.prefs.setBoolPref(
+        "zen.view.use-single-toolbar",
+        Services.prefs.getBoolPref(
+          "zen.view.use-single-toolbar.before-collapse"
+        )
+      );
+    }
   },
 
   get navigatorToolbox() {
