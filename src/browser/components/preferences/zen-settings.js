@@ -775,6 +775,8 @@ const ZEN_CKS_INPUT_FIELD_CLASS = `${ZEN_CKS_CLASS_BASE}-input`;
 const ZEN_CKS_LABEL_CLASS = `${ZEN_CKS_CLASS_BASE}-label`;
 const ZEN_CKS_WRAPPER_ID = `${ZEN_CKS_CLASS_BASE}-wrapper`;
 const ZEN_CKS_GROUP_PREFIX = `${ZEN_CKS_CLASS_BASE}-group`;
+// Keep in sync with the settings search filtering (findInPage.js).
+const ZEN_CKS_SECTION_CLASS = `${ZEN_CKS_CLASS_BASE}-section`;
 const KEYBIND_ATTRIBUTE_KEY = "key";
 
 const zenMissingKeyboardShortcutL10n = {
@@ -894,10 +896,15 @@ var gZenCKSSettings = {
     for (let group of VALID_SHORTCUT_GROUPS) {
       let groupClass = `${ZEN_CKS_GROUP_PREFIX}-${group}`;
       if (!wrapper.querySelector(`[data-group="${groupClass}"]`)) {
+        // Wrap each group so the settings search can show only the groups
+        // containing a matching shortcut.
+        let sectionElem = document.createXULElement("vbox");
+        sectionElem.classList.add(ZEN_CKS_SECTION_CLASS);
         let groupElem = document.createElement("h2");
         groupElem.setAttribute("data-group", groupClass);
         document.l10n.setAttributes(groupElem, groupClass);
-        wrapper.appendChild(groupElem);
+        sectionElem.appendChild(groupElem);
+        wrapper.appendChild(sectionElem);
       }
     }
 
