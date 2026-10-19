@@ -678,6 +678,15 @@ index 9093501ce7d288a51ba4822637e58a67c3faa273..1b768808fba7706388588f66d7becfdc
  
          // Keep the focus status, since the attribute may be changed
          // upon calling this.focus().
+@@ -5390,7 +5754,7 @@
+ 
+         // Clear any previous selection unless we are focused, to ensure it
+         // doesn't affect drag selection.
+-        if (this.focusedViaMousedown) {
++        if (this.focusedViaMousedown && event.type != "click") {
+           this.inputField.setSelectionRange(0, 0);
+         }
+ 
 @@ -5410,7 +5774,7 @@ ${
          }
          // Don't close the view when clicking on a tab; we may want to keep the
