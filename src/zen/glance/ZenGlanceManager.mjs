@@ -600,13 +600,30 @@ class nsZenGlanceManager extends nsZenDOMOperatedFeature {
       // Recalculate location. When opening from pinned tabs,
       // view splitter doesn't catch if the tab is a glance tab or not.
       gZenViewSplitter.onLocationChange(browserElement);
+      const glanceID = this.#currentGlanceID;
       if (data.width && data.height) {
         // It is guaranteed that we will animate this opacity later on
         // when we start animating the glance.
         this.contentWrapper.style.opacity = 0;
         data.elementData = await this.#getElementPreviewData(data);
       }
-      this.#glances.get(this.#currentGlanceID).elementData = data.elementData;
+      const glance = this.#glances.get(glanceID);
+      if (!glance) {
+        // Fully closed while the preview was captured: nothing left to open.
+        if (data.elementData) {
+          URL.revokeObjectURL(data.elementData);
+        }
+        resolve(null);
+        return;
+      }
+      glance.elementData = data.elementData;
+      // Closed while the preview was captured (e.g. a popup that closes right
+      // away). The close already restored the parent, so starting the opening
+      // animation now would leave the parent dimmed for good.
+      if (this.closingGlance) {
+        resolve(null);
+        return;
+      }
       this.#executeGlanceAnimation(data, browserElement, resolve);
     });
   }
