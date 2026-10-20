@@ -485,6 +485,10 @@ class ZenLibraryDownloadStack {
    */
   attachLibrary(library) {
     this.#library = library;
+    // Opening the library is seeing the new download, however it was opened,
+    // not only by hovering the button.
+    this.#recentNewDownload = false;
+    this.#updateBadgeShowing();
     this.#applyDownloadState();
   }
 
