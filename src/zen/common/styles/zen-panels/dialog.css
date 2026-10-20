@@ -21,3 +21,10 @@
     transform: translateY(-10%);
   }
 }
+
+/* Content prompts are sized to the measured document height, which doesn't
+ * include the border above. Make room for it, otherwise the prompt content
+ * gets squeezed and the last line of the message is clipped (gh-13400). */
+:root .content-prompt-dialog > .dialogOverlay {
+  grid-auto-rows: min(90%, calc(var(--doc-height-px) + 2px));
+}
