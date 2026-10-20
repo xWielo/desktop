@@ -50,3 +50,8 @@
 
 - name: browser.urlbar.shortcuts.workspaces
   value: true
+
+# Enables the full @keyword shortcuts (@actions, @spaces, @tabs, ...). Firefox
+# only enables them through scotchBonnet.enableOverride, which Zen disables.
+- name: browser.urlbar.searchRestrictKeywords.featureGate
+  value: true

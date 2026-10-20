@@ -1,0 +1,17 @@
+diff --git a/browser/components/urlbar/UrlbarTokenizer.sys.mjs b/browser/components/urlbar/UrlbarTokenizer.sys.mjs
+index d63efa5fda95b5855484e8975a03fd3425cfe399..97b04ff16e50945fbdc5cd151cc25d231c6c6f3a 100644
+--- a/browser/components/urlbar/UrlbarTokenizer.sys.mjs
++++ b/browser/components/urlbar/UrlbarTokenizer.sys.mjs
+@@ -22,7 +22,11 @@ ChromeUtils.defineLazyGetter(lazy, "logger", () =>
+ );
+ 
+ ChromeUtils.defineLazyGetter(lazy, "gFluentStrings", function () {
+-  return new Localization(["browser/browser.ftl"]);
++  // Zen's workspaces keyword label is defined in this file, not in browser.ftl.
++  return new Localization([
++    "browser/browser.ftl",
++    "preview/enUS-searchFeatures.ftl",
++  ]);
+ });
+ 
+ /**
