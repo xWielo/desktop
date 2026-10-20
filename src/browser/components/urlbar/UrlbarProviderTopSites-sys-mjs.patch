@@ -1,7 +1,7 @@
 diff --git a/browser/components/urlbar/UrlbarProviderTopSites.sys.mjs b/browser/components/urlbar/UrlbarProviderTopSites.sys.mjs
 --- a/browser/components/urlbar/UrlbarProviderTopSites.sys.mjs
 +++ b/browser/components/urlbar/UrlbarProviderTopSites.sys.mjs
-@@ -153,7 +153,21 @@
+@@ -153,7 +153,25 @@
        lazy.UrlbarPrefs.get("maxRichResults"),
        lazy.TOP_SITES_MAX_SITES_PER_ROW * UrlbarProviderTopSites.topSitesRows
      );
@@ -14,11 +14,15 @@ diff --git a/browser/components/urlbar/UrlbarProviderTopSites.sys.mjs b/browser/
 +      "zen.urlbar.show-sponsored",
 +      false
 +    );
++    // Top Sites report history-backed sites (type "history") even when
++    // browser.urlbar.suggest.history is off. Pinned sites are kept.
++    const showHistory = lazy.UrlbarPrefs.get("suggest.history");
 +    sites = sites
 +      .filter(
 +        site =>
 +          (showPinned || !site.isPinned) &&
-+          (showSponsored || !site.sponsored_position)
++          (showSponsored || !site.sponsored_position) &&
++          (showHistory || site.isPinned || site.type != "history")
 +      )
 +      .slice(0, numTopSites);
  
