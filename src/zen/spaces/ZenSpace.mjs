@@ -142,7 +142,12 @@ export class nsZenWorkspace extends MozXULElement {
       false
     );
 
-    this.scrollbox.addEventListener("wheel", this, true);
+    // Must stay passive: a non-passive wheel listener makes APZ wait for the
+    // main thread before scrolling the tab list (gh-14252).
+    this.scrollbox.addEventListener("wheel", this, {
+      capture: true,
+      passive: true,
+    });
     this.scrollbox.addEventListener("underflow", this);
     this.scrollbox.addEventListener("overflow", this);
 
