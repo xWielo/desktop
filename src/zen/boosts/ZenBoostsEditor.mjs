@@ -1427,11 +1427,9 @@ ${cssSelector} {
       return;
     }
     const newName = input.value;
-    const maxDisplayedNameChars = 10;
 
     if (newName.trim().length !== 0) {
-      var truncatedName = newName.substring(0, maxDisplayedNameChars);
-      this.currentBoostData.boostName = truncatedName;
+      this.currentBoostData.boostName = newName;
       nameText.textContent = this.currentBoostData.boostName;
       this.updateCurrentBoost();
     }
