@@ -119,7 +119,74 @@ index 229e7960fc461475426b538f3a5fdc134a99ebcf..22b0eb8e23fc56cd4d8892e3ecebe389
        }
      }
  
-@@ -2395,7 +2414,7 @@ this.PlacesPanelview = class PlacesPanelview extends PlacesViewBase {
+@@ -1429,10 +1448,45 @@ class PlacesToolbar extends PlacesViewBase {
+     this._viewElt.dispatchEvent(event);
+   }
+ 
++  // Zen: the toolbar only builds the bookmarks of the active workspace, so its
++  // children no longer match the children of the result node one to one.
++  // Rebuild it instead of patching the DOM by index. A rebuild that is still
++  // running must finish first, or both would append their nodes.
++  _rebuildIfWorkspaceFiltered() {
++    if (typeof gZenWorkspaces === "undefined") {
++      return false;
++    }
++    let filtered = false;
++    for (let i = 0; i < this._resultNode.childCount && !filtered; ++i) {
++      filtered = gZenWorkspaces.isBookmarkInAnotherWorkspace(
++        this._resultNode.getChild(i)
++      );
++    }
++    let pending = this.promiseRebuilt();
++    if (!filtered && !pending) {
++      return false;
++    }
++    if (!pending) {
++      this.invalidateContainer(this._resultNode);
++    } else if (!this._workspaceRebuildQueued) {
++      this._workspaceRebuildQueued = true;
++      pending.then(() => {
++        this._workspaceRebuildQueued = false;
++        if (this._isAlive) {
++          this.invalidateContainer(this._resultNode);
++        }
++      });
++    }
++    return true;
++  }
++
+   nodeInserted(aParentPlacesNode, aPlacesNode, aIndex) {
+     let parentElt = this._getDOMNodeForPlacesNode(aParentPlacesNode);
+     if (parentElt == this._rootElt) {
+       // Node is on the toolbar.
++      if (this._rebuildIfWorkspaceFiltered()) {
++        return;
++      }
+       let children = this._rootElt.children;
+       // Nothing to do if it's a never-visible node, but note it's possible
+       // we are appending.
+@@ -1480,6 +1534,9 @@ class PlacesToolbar extends PlacesViewBase {
+     let parentElt = this._getDOMNodeForPlacesNode(aParentPlacesNode);
+     if (parentElt == this._rootElt) {
+       // Node is on the toolbar.
++      if (this._rebuildIfWorkspaceFiltered()) {
++        return;
++      }
+       let elt = this._getDOMNodeForPlacesNode(aPlacesNode, true);
+       // Nothing to do if it's a never-visible node.
+       if (!elt) {
+@@ -1519,7 +1576,10 @@ class PlacesToolbar extends PlacesViewBase {
+     let parentElt = this._getDOMNodeForPlacesNode(aNewParentPlacesNode);
+     if (parentElt == this._rootElt) {
+       // Node is on the toolbar.
++      if (this._rebuildIfWorkspaceFiltered()) {
++        return;
++      }
+       // Do nothing if the node will never be visible.
+       let lastBuiltIndex = this._rootElt.children.length - 1;
+       if (aOldIndex > lastBuiltIndex && aNewIndex > lastBuiltIndex + 1) {
+         return;
+@@ -2395,7 +2455,7 @@ this.PlacesPanelview = class PlacesPanelview extends PlacesViewBase {
          PlacesUIUtils.guessUrlSchemeForUI(placesNode.uri)
        );
        element.setAttribute("label", PlacesUIUtils.getBestTitle(placesNode));
