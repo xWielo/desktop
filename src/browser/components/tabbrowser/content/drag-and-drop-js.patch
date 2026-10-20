@@ -137,7 +137,7 @@ index f9623f82499e516050d523068e70ebaa4fe9a66a..95bcc078a86b4ec4b35f5916b7e4a5e3
  
            let nextItem = this._tabbrowserTabs.dragAndDropElements[newIndex];
            let tabGroup = isTab(nextItem) && nextItem.group;
-+          if (gZenViewSplitter.handleTabDrop(event, urls, replace, inBackground)) return;
++          if (gZenViewSplitter.handleTabDrop(event, urls)) return;
            gBrowser.loadTabs(urls, {
              inBackground,
              replace,

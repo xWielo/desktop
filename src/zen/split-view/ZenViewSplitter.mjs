@@ -2353,8 +2353,10 @@ class nsZenViewSplitter extends nsZenDOMOperatedFeature {
       .then(callback);
   }
 
-  handleTabDrop(event, urls, replace) {
-    if (replace || urls.length !== 1) {
+  handleTabDrop(event, urls) {
+    // Dropping onto an existing tab sets `replace`; a split panel drop must
+    // still unsplit in that case instead of loading its id as a URL.
+    if (urls.length !== 1) {
       return false;
     }
     const url = urls[0];
