@@ -338,6 +338,7 @@ class KeyShortcut {
   #l10nId = "";
   #disabled = false;
   #reserved = false;
+  #unreserved = false;
   #internal = false;
 
   constructor(
@@ -350,7 +351,8 @@ class KeyShortcut {
     l10nId,
     disabled = false,
     reserved = false,
-    internal = false
+    internal = false,
+    unreserved = false
   ) {
     this.#id = id;
     this.#key = key?.toLowerCase();
@@ -366,6 +368,7 @@ class KeyShortcut {
     this.#l10nId = KeyShortcut.sanitizeL10nId(l10nId, action);
     this.#disabled = disabled;
     this.#reserved = reserved;
+    this.#unreserved = unreserved;
     this.#internal = internal;
   }
 
@@ -405,7 +408,8 @@ class KeyShortcut {
       json.l10nId,
       json.disabled,
       json.reserved,
-      json.internal
+      json.internal,
+      json.unreserved
     );
   }
 
@@ -426,7 +430,8 @@ class KeyShortcut {
       key.getAttribute("data-l10n-id"),
       key.getAttribute("disabled") == "true",
       key.getAttribute("reserved") == "true",
-      key.getAttribute("internal") == "true"
+      key.getAttribute("internal") == "true",
+      key.getAttribute("reserved") == "false"
     );
   }
 
@@ -506,6 +511,11 @@ class KeyShortcut {
     }
     if (this.#reserved) {
       key.setAttribute("reserved", this.#reserved);
+    } else if (this.#unreserved) {
+      // Firefox marks Backspace and Delete with reserved="false". Without it they
+      // become reserved when sites can't override shortcuts
+      // (permissions.default.shortcuts = 2), so they never reach text fields.
+      key.setAttribute("reserved", "false");
     }
     if (this.#internal) {
       key.setAttribute("internal", this.#internal);
@@ -517,6 +527,10 @@ class KeyShortcut {
 
   _modifyInternalAttribute(value) {
     this.#internal = value;
+  }
+
+  _modifyUnreservedAttribute(value) {
+    this.#unreserved = value;
   }
 
   getRealKeycode() {
@@ -575,6 +589,10 @@ class KeyShortcut {
     return this.#reserved;
   }
 
+  isUnreserved() {
+    return this.#unreserved;
+  }
+
   isInternal() {
     return this.#internal;
   }
@@ -601,6 +619,7 @@ class KeyShortcut {
       action: this.#action,
       disabled: this.#disabled,
       reserved: this.#reserved,
+      unreserved: this.#unreserved,
       internal: this.#internal,
     };
   }
@@ -894,7 +913,7 @@ class nsZenKeyboardShortcutsLoader {
 }
 
 class nsZenKeyboardShortcutsVersioner {
-  static LATEST_KBS_VERSION = 21;
+  static LATEST_KBS_VERSION = 22;
 
   constructor() {}
 
@@ -1334,6 +1353,27 @@ class nsZenKeyboardShortcutsVersioner {
           "zen-library-shortcut-toggle"
         )
       );
+    }
+
+    if (version < 22) {
+      // Migrate from version 21 to 22.
+      // Saved copies of Firefox's reserved="false" keys (Backspace, Delete) lost that
+      // attribute, so they stopped reaching text fields when sites can't override
+      // shortcuts (permissions.default.shortcuts = 2). Flag them again.
+      const unreservedShortcuts = nsZenKeyboardShortcutsLoader
+        .zenGetDefaultShortcuts()
+        .filter(shortcut => shortcut.isUnreserved());
+      for (let shortcut of data) {
+        if (
+          unreservedShortcuts.some(
+            unreserved =>
+              unreserved.getID() == shortcut.getID() &&
+              unreserved.getAction() == shortcut.getAction()
+          )
+        ) {
+          shortcut._modifyUnreservedAttribute(true);
+        }
+      }
     }
 
     return data;
