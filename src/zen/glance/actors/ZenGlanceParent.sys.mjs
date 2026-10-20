@@ -28,13 +28,39 @@ export class ZenGlanceParent extends JSWindowActorParent {
         break;
       }
       case "ZenGlance:RecordLinkClickData": {
-        this.browsingContext.topChromeWindow.gZenGlanceManager.lastLinkClickData =
-          message.data;
+        const { topChromeWindow } = this.browsingContext;
+        topChromeWindow.gZenGlanceManager.lastLinkClickData =
+          this.#toTabPanelsCoordinates(topChromeWindow, message.data);
         break;
       }
       default:
         console.warn(`[glance]: Unknown message: ${message.name}`);
     }
+  }
+
+  /**
+   * The link rect is relative to the content viewport, i.e. the origin of the
+   * <browser> hosting it. Glance animates relative to the tabpanels, which only
+   * matches that origin for a full-size tab. Split-view tiles sit at an offset
+   * inside the tabpanels, so shift the rect by the browser's offset.
+   *
+   * @param {Window} topChromeWindow
+   * @param {object} data - The link rect in content viewport coordinates
+   * @returns {object} The link rect in tabpanels coordinates
+   */
+  #toTabPanelsCoordinates(topChromeWindow, data) {
+    const browserRect =
+      this.browsingContext.topFrameElement?.getBoundingClientRect();
+    if (!browserRect) {
+      return data;
+    }
+    const panelsRect =
+      topChromeWindow.gBrowser.tabpanels.getBoundingClientRect();
+    return {
+      ...data,
+      clientX: data.clientX + browserRect.left - panelsRect.left,
+      clientY: data.clientY + browserRect.top - panelsRect.top,
+    };
   }
 
   openGlance(window, data) {
