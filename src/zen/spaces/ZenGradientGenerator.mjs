@@ -1493,7 +1493,12 @@ export class nsZenThemePicker extends nsZenMultiWindowFeature {
       return `rgb(${r}, ${g}, ${b})`;
     }
     const [h, s, l] = this.rgbToHsl(...accentColor);
-    const saturation = Math.min(1, s + 0.3);
+    // gh-13513: Native accent colors are blended with the slightly blue toolbar base in
+    // getNativeAccentColor(), so neutral accents are not exactly grayscale. Use the RGB
+    // spread rather than HSL saturation, which grows near white and black, so that light
+    // greys are not boosted into dark blue or purple.
+    const chroma = Math.max(r, g, b) - Math.min(r, g, b);
+    const saturation = chroma <= 3 ? 0 : Math.min(1, s + 0.3);
     const targetLightness = this.isDarkMode ? 0.62 : 0.42;
     const lightness = l * 0.4 + targetLightness * 0.6;
     [r, g, b] = this.hslToRgb(h / 360, saturation, lightness);
