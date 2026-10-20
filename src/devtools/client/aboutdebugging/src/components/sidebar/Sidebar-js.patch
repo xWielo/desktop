@@ -1,0 +1,14 @@
+diff --git a/devtools/client/aboutdebugging/src/components/sidebar/Sidebar.js b/devtools/client/aboutdebugging/src/components/sidebar/Sidebar.js
+index c6dabd1..d0e1294 100644
+--- a/devtools/client/aboutdebugging/src/components/sidebar/Sidebar.js
++++ b/devtools/client/aboutdebugging/src/components/sidebar/Sidebar.js
+@@ -43,8 +43,7 @@ const SidebarRuntimeItem = createFactory(
+ const RefreshDevicesButton = createFactory(
+   require("resource://devtools/client/aboutdebugging/src/components/sidebar/RefreshDevicesButton.js")
+ );
+-const FIREFOX_ICON =
+-  "chrome://devtools/skin/images/aboutdebugging-firefox-logo.svg";
++const FIREFOX_ICON = "chrome://branding/content/about-logo.svg";
+ const CONNECT_ICON = "chrome://devtools/skin/images/settings.svg";
+ const GLOBE_ICON =
+   "chrome://devtools/skin/images/aboutdebugging-globe-icon.svg";
