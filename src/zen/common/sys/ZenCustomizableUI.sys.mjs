@@ -245,8 +245,8 @@ export const ZenCustomizableUI = new (class {
       if (event.button !== 0) {
         return;
       }
-      toolbox.style.width = defaultWidth;
-      toolbox.setAttribute("width", defaultWidth);
+      const { min, max } = getWidthLimits();
+      setWidth(Math.min(max, Math.max(min, parseFloat(defaultWidth))));
     });
   }
 
