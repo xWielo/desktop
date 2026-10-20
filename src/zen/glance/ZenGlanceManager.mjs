@@ -1644,6 +1644,13 @@ class nsZenGlanceManager extends nsZenDOMOperatedFeature {
       return false;
     }
 
+    // The overlay references only follow the displayed glance. A background
+    // glance being closed may have stale references, or none at all once a
+    // previous glance has finished closing, so bind them to this glance first.
+    if (this.#currentBrowser) {
+      this.fillOverlay(this.#currentBrowser);
+    }
+
     this.closeGlance({
       onTabClose: true,
       setNewID: isDifferent ? oldGlanceID : null,
