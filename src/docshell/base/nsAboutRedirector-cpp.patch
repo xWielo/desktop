@@ -11,3 +11,12 @@ index 9f6fc3eac6f20aedeb993306818fc536f5ce851a..7269a78061f4be829acd2e1b053565b2
       nsIAboutModule::URI_SAFE_FOR_UNTRUSTED_CONTENT |
           nsIAboutModule::URI_MUST_LOAD_IN_CHILD},
      {"fingerprintingprotection",
+@@ -143,7 +143,7 @@ static const RedirEntry kRedirMap[] = {
+          nsIAboutModule::IS_SECURE_CHROME_UI},
+     {"logging", "chrome://global/content/aboutLogging/aboutLogging.html",
+      nsIAboutModule::ALLOW_SCRIPT},
+-    {"logo", "chrome://branding/content/about.png",
++    {"logo", "chrome://branding/content/about-logo.png",
+      nsIAboutModule::URI_SAFE_FOR_UNTRUSTED_CONTENT},
+     {"memory", "chrome://global/content/aboutMemory.xhtml",
+      nsIAboutModule::ALLOW_SCRIPT},
