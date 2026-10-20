@@ -2508,10 +2508,7 @@ class nsZenViewSplitter extends nsZenDOMOperatedFeature {
   }
 
   onAfterWorkspaceSessionRestore() {
-    if (
-      gBrowser.selectedTab.group?.hasAttribute("split-view-group") &&
-      !gBrowser.selectedTab.pinned
-    ) {
+    if (gBrowser.selectedTab.group?.hasAttribute("split-view-group")) {
       // Activate all browsers in the split view
       this.currentView = -1;
       this.onLocationChange(gBrowser.selectedTab.linkedBrowser);
